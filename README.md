@@ -1,4 +1,4 @@
-# node-prisma-auth-starter
+# Node Prisma Auth Starter (NodePrismaAS)
 
 ![Node](https://img.shields.io/badge/node-20+-green)
 ![Next.js](https://img.shields.io/badge/next.js-14+-black)
@@ -136,7 +136,9 @@ FRONTEND_URL=http://localhost:3000
 
 ---
 
-## Backend structure
+## Project structure
+
+### Backend structure
 
 - `prisma.config.ts`         – Prisma 7 config (datasource, adapters)
 - `prisma/schema.prisma`     – Prisma schema (User, Movie, WatchlistItems, etc.)
@@ -147,8 +149,6 @@ FRONTEND_URL=http://localhost:3000
 - `src/controllers/authController.js` – register, login, logout, forgot/reset password
 - `src/routes/authRoutes.js`   – `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/forgot-password`, `/auth/reset-password`
 - `index.js` / `src/server.js` – Express server bootstrap
-
----
 
 ## Frontend structure (Next.js App Router)
 

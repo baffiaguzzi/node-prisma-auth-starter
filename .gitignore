@@ -1,6 +1,13 @@
+# Node
 node_modules
-# Keep environment variables out of version control
+npm-debug.log*
+yarn-error.log*
+
+# Env
 .env
 
-/src/generated/prisma
-/prisma/seed.js
+# Prisma generated client (if not committed)
+src/generated/prisma
+
+# Optional seed script if local-only
+prisma/seed.js
