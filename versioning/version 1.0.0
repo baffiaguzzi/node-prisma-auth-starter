@@ -1,0 +1,131 @@
+VERSION 1.0.0
+last update: 05/03/26
+
+1  - initialize project
+       npm init -y
+       npm i express
+
+2  - initial folder and file
+       create: /src
+       create: src/server.js
+
+3  - dev tooling
+       npm i nodemon --save-dev (firstly using: node src/server.js)
+       npm run dev  (script "dev": "nodemon index.js")
+
+4  - Postman setup
+       new environment
+       new collection
+       new requests
+
+5  - initial routes
+       create: src/routes
+       create: src/routes/mainRoutes.js
+
+6  - Docker Postgres (DB locale)
+       install Docker Desktop
+       docker run --name backend-postgres \
+         -e POSTGRES_USER=postgres \
+         -e POSTGRES_PASSWORD=postgres \
+         -e POSTGRES_DB=backend_api \
+         -p 5432:5432 \
+         -d postgres:16
+
+7  - Prisma 7 installation
+       npm install prisma@7.4.2 @prisma/client@7.4.2 --save-dev
+       npx prisma init   (create prisma/schema.prisma and .env base)
+
+8  - .env (local db)
+       npm i dotenv
+       .env:
+         DATABASE_URL="postgresql://postgres:postgres@localhost:5432/backend_api"
+         NODE_ENV="development"
+
+9  - Prisma 7 config file
+       create: prisma.config.ts
+       content:
+         import "dotenv/config";
+         import { defineConfig, env } from "prisma/config";
+
+         export default defineConfig({
+           schema: "prisma/schema.prisma",
+           migrations: { path: "prisma/migrations" },
+           datasource: { url: env("DATABASE_URL") },
+         });
+
+10 - Prisma schema (models)
+       edit: prisma/schema.prisma
+         - generator client (output: ../src/generated/prisma)
+         - datasource db { provider = "postgresql" }
+         - add models: User, Movie, WatchlistItems, enum WatchlistStatus
+
+11 - initialize DB (migrations)
+       npx prisma migrate dev --name add_users_tab
+       npx prisma migrate dev --name added_other_tables
+
+12 - generate Prisma Client
+       rm -rf src/generated/prisma
+       npx prisma generate
+
+13 - DB config (Prisma 7 + pg adapter)
+       npm install @prisma/adapter-pg pg
+       create/edit: src/config/db.js
+         - import { PrismaClient } from "../generated/prisma/index.js";
+         - import { PrismaPg } from "@prisma/adapter-pg";
+         - import pg from "pg";
+         - create Pool con process.env.DATABASE_URL
+         - const adapter = new PrismaPg(pool);
+         - const prisma = new PrismaClient({ adapter, log: [...] });
+         - export { prisma, connectDB, disconnectDB };
+
+14 - server entrypoint
+       create: index.js
+         import "dotenv/config";
+         import "./src/server.js";
+
+       fix: src/server.js
+         - import connectDB / disconnectDB
+         - use app.use("/movies", movieRoutes);
+         - use app.use("/auth", authRoutes);
+         - startServer() to call connectDB() and then app.listen(5001)
+
+15 - authentication
+       create: src/routes/authRoutes.js
+         - POST /auth/register → controller
+
+       create: src/controllers/authController.js
+         - import { prisma } from "../config/db.js";
+         - import bcrypt from "bcryptjs";
+         - register(): check email, hash password, prisma.user.create()
+
+       npm i bcryptjs
+
+16 - run flow (oggi)
+       # 1. avvia Docker + Postgres
+       docker start backend-postgres
+
+       # 2. generate client/migrations if needed
+       rm -rf src/generated/prisma
+       npx prisma generate
+       npx prisma migrate dev --name init (already done)
+
+       # 3. lauch backend
+       npm run dev
+
+       # 4. test
+       GET  http://localhost:5001/movies
+       POST http://localhost:5001/auth/register
+         {
+           "name": "Pedro",
+           "email": "pedro.tester@gmail.com",
+           "password": "password1234"
+         }
+
+17 - set cors to allow requests from frontend
+       npm i cors
+
+18 - login + jwt
+       npm i jsonwebtoken
+       openssl rand -base64 32
+       create: utils/generateToken.js
+         - POST /auth/login → controller

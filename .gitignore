@@ -1,0 +1,13 @@
+# Node
+node_modules
+npm-debug.log*
+yarn-error.log*
+
+# Env
+.env
+
+# Prisma generated client (if not committed)
+src/generated/prisma
+
+# Optional seed script if local-only
+prisma/seed.js
